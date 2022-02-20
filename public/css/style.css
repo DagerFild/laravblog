@@ -1,8 +1,29 @@
 body {
     background: #fff;
-
 }
 
 nav {
     margin-bottom: 15px;
+}
+
+.card {
+    margin-bottom: 10px;
+
+}
+
+.card-img {
+    height: 200px;
+    background-position: center center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    overflow: hidden;
+    border: 1px solid #000;
+}
+
+.card-img, .card-author {
+    margin-bottom: 10px;
+}
+
+.form-group {
+    margin-bottom: 10px;
 }
