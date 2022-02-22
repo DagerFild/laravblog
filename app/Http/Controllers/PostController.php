@@ -78,7 +78,7 @@
          *
          * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Http\Response
          */
-        public function show($id): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\Contracts\Foundation\Application
+        public function show(int $id): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\Contracts\Foundation\Application
         {
             $post = Post::join('users', 'author_id', '=', 'users.user_id')
                     ->find($id);
@@ -104,11 +104,24 @@
          * @param  \Illuminate\Http\Request  $request
          * @param  int  $id
          *
-         * @return \Illuminate\Http\Response
+         * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
          */
-        public function update(Request $request, $id)
+        public function update(Request $request, int $id): \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
         {
-            //
+            $post = Post::find($id);
+            $post->title = $request->title;
+            $post->short_title = Str::length($request->title) > 30
+              ? Str::substr($request->title, 0, 30).'...'
+              : $request->title;
+            $post->descr = $request->descr;
+            if ($request->file('img')) {
+                $path = \Storage::putFile('public', $request->file('img'));
+                $url = \Storage::url($path);
+                $post->img = $url;
+            }
+            $post->update();
+            $id = $post->post_id;
+            return redirect()->route('post.show', compact('id'))->with('success', 'Пост успешно отредактирован!');
         }
 
         /**
@@ -116,11 +129,13 @@
          *
          * @param  int  $id
          *
-         * @return \Illuminate\Http\Response
+         * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
          */
-        public function destroy($id)
+        public function destroy(int $id): \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
         {
-            //
+            $post = Post::find($id);
+            $post->delete();
+            return redirect()->route('post.index', compact('id'))->with('success', 'Пост успешно удален!');
         }
 
     }

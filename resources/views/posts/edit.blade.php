@@ -1,4 +1,4 @@
-@extends('layouts.layout')
+@extends('layouts.layout', ['title' => 'Редактирование поста "' . $post->short_title . '"'])
 
 @section('content')
 
