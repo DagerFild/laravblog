@@ -2,6 +2,7 @@
 
     namespace App\Http\Controllers;
 
+    use App\Http\Requests\PostRequest;
     use App\Models\Post;
     use Illuminate\Http\Request;
     use Illuminate\Support\Str;
@@ -48,11 +49,11 @@
         /**
          * Store a newly created resource in storage.
          *
-         * @param  \Illuminate\Http\Request  $request
+         * @param  \App\Http\Requests\PostRequest  $request
          *
          * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
          */
-        public function store(Request $request
+        public function store(PostRequest $request
         ): \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse {
             $post = new Post();
             $post->title = $request->title;
@@ -101,12 +102,12 @@
         /**
          * Update the specified resource in storage.
          *
-         * @param  \Illuminate\Http\Request  $request
+         * @param  \App\Http\Requests\PostRequest  $request
          * @param  int  $id
          *
          * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
          */
-        public function update(Request $request, int $id): \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
+        public function update(PostRequest $request, int $id): \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
         {
             $post = Post::find($id);
             $post->title = $request->title;
