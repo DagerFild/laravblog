@@ -5,10 +5,15 @@
     use App\Http\Requests\PostRequest;
     use App\Models\Post;
     use Illuminate\Http\Request;
+    use Illuminate\Support\Facades\Auth;
     use Illuminate\Support\Str;
 
     class PostController extends Controller
     {
+        public function __construct()
+        {
+            $this->middleware('auth')->except('index', 'show');
+        }
 
         /**
          * Display a listing of the resource.
@@ -61,7 +66,7 @@
               ? Str::substr($request->title, 0, 30).'...'
               : $request->title;
             $post->descr = $request->descr;
-            $post->author_id = random_int(1, 4);
+            $post->author_id = Auth::user()->user_id;
 
             if ($request->file('img')) {
                 $path = \Storage::putFile('public', $request->file('img'));
@@ -77,12 +82,15 @@
          *
          * @param  int  $id
          *
-         * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Http\Response
+         * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Http\RedirectResponse
          */
-        public function show(int $id): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\Contracts\Foundation\Application
+        public function show(int $id): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
         {
             $post = Post::join('users', 'author_id', '=', 'users.user_id')
                     ->find($id);
+            if (is_null($post)) {
+                return redirect()->route('index')->withErrors('Данного поста не существует!');
+            }
             return view('posts.show', compact('post'));
         }
 
@@ -91,11 +99,17 @@
          *
          * @param  int  $id
          *
-         * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Http\Response
+         * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Http\RedirectResponse
          */
-        public function edit($id): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\Contracts\Foundation\Application
+        public function edit(int $id): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
         {
             $post = Post::find($id);
+            if (is_null($post)) {
+                return redirect()->route('index')->withErrors('Невозможно отредактировать несуществующий пост!');
+            }
+            if ($post->author_id != \Auth::user()->user_id) {
+                return redirect()->route('index')->withErrors('Вы не можете редактировать чужой пост!');
+            }
             return view('posts.edit', compact('post'));
         }
 
@@ -110,6 +124,12 @@
         public function update(PostRequest $request, int $id): \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
         {
             $post = Post::find($id);
+            if (is_null($post)) {
+                return redirect()->route('index')->withErrors('Невозможно отредактировать несуществующий пост!');
+            }
+            if ($post->author_id != \Auth::user()->user_id) {
+                return redirect()->route('index')->withErrors('Вы не можете редактировать чужой пост!');
+            }
             $post->title = $request->title;
             $post->short_title = Str::length($request->title) > 30
               ? Str::substr($request->title, 0, 30).'...'
@@ -135,6 +155,12 @@
         public function destroy(int $id): \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
         {
             $post = Post::find($id);
+            if (is_null($post)) {
+                return redirect()->route('index')->withErrors('Невозможно удалить несуществующий пост!');
+            }
+            if ($post->author_id != \Auth::user()->user_id) {
+                return redirect()->route('index')->withErrors('Вы не можете удалить чужой пост!');
+            }
             $post->delete();
             return redirect()->route('post.index', compact('id'))->with('success', 'Пост успешно удален!');
         }
