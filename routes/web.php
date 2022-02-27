@@ -22,6 +22,9 @@ Route::post('post/', '\App\Http\Controllers\PostController@store')->name('post.s
 Route::patch('post/{id}', '\App\Http\Controllers\PostController@update')->name('post.update');
 Route::delete('post/{id}', '\App\Http\Controllers\PostController@destroy')->name('post.destroy');
 
+Route::fallback(static function(){
+        return view('errors.404');
+    });
 
 
 Auth::routes();

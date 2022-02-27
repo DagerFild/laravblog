@@ -5,7 +5,7 @@
      <meta name="viewport"
 					 content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
            <meta http-equiv="X-UA-Compatible" content="ie=edge">
-     <title>{{ $title }}</title>
+     <title>{{ $title ?? __('Laravblog') }}</title>
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
     <link rel="shortcut icon" href="{{ asset('img/favicon.ico') }}">
@@ -16,10 +16,10 @@
     <div class="container collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="col-6 navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link @if(request()->route()->getName() == "index")active @endif" aria-current="page" href="/">Главная</a>
+          <a class="nav-link @if(!is_null(request()->route()) && request()->route()->getName() == "index")active @endif" aria-current="page" href="/">Главная</a>
         </li>
         <li class="nav-item offset-3">
-          <a class="nav-link @if(request()->route()->getName() == "post.create")active @endif" aria-current="page" href="{{ route('post.create') }}">Создать пост</a>
+          <a class="nav-link @if(!is_null(request()->route()) && request()->route()->getName() == "post.create")active @endif" aria-current="page" href="{{ route('post.create') }}">Создать пост</a>
         </li>
       </ul>
       <form class="d-flex my-2 my-lg-0" action="{{ route('post.index') }}">
@@ -31,13 +31,13 @@
 				@guest
 					@if (Route::has('login'))
 						<li class="nav-item">
-								<a class="btn btn-outline-primary @if(request()->route()->getName() == "login") disabled @endif" href="{{ route('login') }}">{{ __('Войти') }}</a>
+								<a class="btn btn-outline-primary @if(!is_null(request()->route()) && request()->route()->getName() == "login") disabled @endif" href="{{ route('login') }}">{{ __('Войти') }}</a>
 						</li>
 					@endif
 
 					@if (Route::has('register'))
 						<li class="nav-item">
-								<a class="btn btn-outline-dark @if(request()->route()->getName() == "register")disabled @endif" style="margin-left: 10px;" href="{{ route('register') }}">{{ __('Зарегистрироваться') }}</a>
+								<a class="btn btn-outline-dark @if(!is_null(request()->route()) && request()->route()->getName() == "register")disabled @endif" style="margin-left: 10px;" href="{{ route('register') }}">{{ __('Зарегистрироваться') }}</a>
 						</li>
 					@endif
 				@else
