@@ -1,5 +1,4 @@
 @extends('layouts.layout', ['title' => 'Главная страница'])
-
 @section('content')
 
   @if(isset($_GET['search']))

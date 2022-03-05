@@ -49,7 +49,7 @@
 							 data-bs-toggle="dropdown"
 							 aria-haspopup="true"
 							 aria-expanded="false">
-								{{ Auth::user()->name }}
+							@if(Auth::user()->role == 'admin' || Auth::user()->role == 'vip') &#128081;	@endif{{ Auth::user()->name }}
 						</a>
 
 						<div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
